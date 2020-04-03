@@ -61,9 +61,25 @@ plot(country, cases, las=3, cex.axis=0.7)
 install.packages("ggplot2")
 library(ggplot2)
 
+#load previously saver R data
+#setting woring directory
+setwd("C/LAB/)
+load(".RData") # put the name of the workspace saved
+ls() 
 
+#use ggplot2 package
+library(ggplot2)
 
+data(mpg)
+head(mpg) 
+#key components og ggplot2: data, aestetics, geometry #aes = variables, geometry is separated
+ggplot(mpg, aes(x=displ,y=hwy)) + geom_point()
+ggplot(mpg, aes(x=displ,y=hwy)) + geom_line() #change the geometry, to bars, lines 
+ggplot(mpg, aes(x=displ,y=hwy)) + geom_polygon()
 
+#ggplot for our covid dataset
+head(covid)
+ggplot(covid, aes(x=lon, y=lat, size=cases)) + geom_point() #size =dimension of point changes with respect to a variable
 
 
 
