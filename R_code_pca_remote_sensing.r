@@ -6,7 +6,7 @@ library(raster)
 library(RStoolbox)
 p224r63_2011 <- brick("p224r63_2011_masked.grd")
 
-#Bi = blue
+#B1 = blue
 #B2 = green
 #B3 = red
 #B4 = NIR (leaf reflects)
@@ -42,13 +42,13 @@ p224r63_2011_res <- aggregate(p224r63_2011, fact=10)
 
 p224r63_2011_pca <- rasterPCA(p224r63_2011_res)
 #plot the map --> $ links pieces of the output
-plot(p224r63_2011_pca$map)
+plot(p224r63_2011_pca$map) #have the default colour palette
 
 #change colour --> colorRampPalette
 cl <- colorRampPalette(c('dark grey','grey','light grey'))(100)
 plot(p224r63_2011_pca$map, col=cl)
 summary(p224r63_2011_pca$model)
-
+#PC1 99.83% of the whole variation 
 
 pairs(p224r63_2011)
 
@@ -59,7 +59,6 @@ plotRGB(p224r63_2011_pca$map, r=1, g=2, b=3, stretch="Lin")
 p224r63_1988_res <- aggregate(p224r63_1988, fact=10)
 p224r63_1988_pca <- rasterPCA(p224r63_1988_res) 
 plot(p224r63_1988_pca$map, col=cl)
-
 summary(p224r63_1988_pca$model)
 pairs(p224r63_1988)
 
