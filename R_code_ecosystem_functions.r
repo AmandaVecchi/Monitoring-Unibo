@@ -31,7 +31,7 @@ defor1 <- brick("defor1_.jpg")
 defor2 <- brick("defor2_.jpg")
 
 # plot two images --> 
-band 1= NIR
+band1= NIR
 band2 = RED
 band3 = GREEN
 
