@@ -14,10 +14,7 @@ cl <- colorRampPalette(c('darkblue','blue','light blue'))(100)
 plot(snowmay, c0l=cl)
 
 # Slow manner to import the set
-setwd("~/lab/snow/")
-# setwd("/Users/utente/lab/snow/") #mac
-# setwd("C:/lab/snow/") # windows
-
+setwd("C:/LAB/snow/") 
 snow2000 <- raster("snow2000r.tif")
 snow2005 <- raster("snow2005r.tif")
 snow2010 <- raster("snow2010r.tif")
@@ -31,9 +28,7 @@ plot(snow2010, col=cl)
 plot(snow2015, col=cl)
 plot(snow2020, col=cl)
 
-##############
-
-# fast version of import and plot of many data for lazy people!
+# importing and plotting of many data quickly
 rlist <- list.files(pattern="snow")
 rlist
 
@@ -41,8 +36,114 @@ import <- lapply(rlist, raster)
 snow.multitemp <- stack(import)
 plot(snow.multitemp, col=cl)
 
-# let's make a prediction
+#prediction
 source("prediction.r")
-
 plot(predicted.snow.2025.norm, col=cl)
+
+
+##SECOND DAY
+
+setwd("C:/LAB/snow/") 
+
+#import all the snow cover images
+rlist <- list.files(pattern="snow")
+rlist #see the imported list
+
+library(raster)
+
+#lapply = applies a function over a list 
+import <- lapply(rlist, raster)
+snow.multitemp <- stack(import) #stack the images
+
+cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
+plot(snow.multitemp, col=cl) #plot all files
+
+#import predicted map
+  #raster function imports one image
+  #brick function imports sveral bands/images all together(satellite images)
+prediction <- raster("predicted.2025.norm.tif") # remember to put the file in the snow folder
+plot(prediction, col = cl)
+
+#export the output
+writeRaster(prediction, "fial.tif") #writes the entire raster to a file, data  #in brackets the mname of the file
+
+#create a PDF of the graph produced at the endo of the analyis
+  #final stack
+final.stack <- stack(snow.multitemp, prediction) #we took the stack of all the images (snow.multitemp), the input and stack it with the prediction we made
+plot(final.stack, col=cl)
+
+#PDF creation
+pdf("Final_graph.pdf)
+plot(final.stack, col=cl)
+dev.off()
+
+# PNG of the graph
+png("Final_graph.png")
+plot(final.stack, col=cl)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
