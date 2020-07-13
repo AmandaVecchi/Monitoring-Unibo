@@ -1,7 +1,7 @@
 ## Multipanel in R: second lecture of Monitoring Ecosystems
 
 install.packages("sp")
-install.packages("GGally)
+install.packages("GGally")
 #GGally is an extension of ggplot2; it adds functions to reduce the complexity of combining geometric objects with transformed data
 
 #library = tells R we want to use the package installed
