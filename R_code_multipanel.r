@@ -2,41 +2,42 @@
 
 install.packages("sp")
 install.packages("GGally)
+#GGally is an extension of ggplot2; it adds functions to reduce the complexity of combining geometric objects with transformed data
 
-#tell R we want to use the package installed
-library(sp) # require(sp) will also do the job
+#library = tells R we want to use the package installed
+library(sp)
+#require(sp) will also do the job
 library(GGally)
 
-#choose the dataset we want to use
-data(meuse) # there is an available dataset named meuse
-
-#use the dataset 
+data(meuse) 
 attach(meuse)
 
-#see the names of the variables in the dataset
-names(meuse) #see all names 
-head(meuse) #shows only the first six lines 
+#names = function to get the name of all variables in the dataset
+names(meuse) 
+head(meuse) #head = function that shows only the first six lines of the dataset
 
-#plot cadmium vs zinc
+#Plot cadmium vs zinc
 plot(cadmium,zinc)
-plot(cadmium,zinc,pch=15,col="red",cex=2) # change symbol, how big it is and colour
+plot(cadmium, zinc, pch=15, col="red", cex=2) 
+#pch = argument used to specify point shapes
+#col = declare the color of the point plotted
+#cex = number indicating the amount by which plotting symbols should be scaled relative to the default. 2 = all points enhanced by 100%
 
-#make all the possible pairwise plots of the dataset
-pairs(meuse) 
+#pairs = creates matrix of all scatterplots of the dataset
+pairs(meuse) #creates all the possible pairwise plots of the dataset
 
-#error = "size of the margins is too large" --> reshae with mouse the graph window and relaunch the code
+#error = "size of the margins is too large". Solution = reshape with mouse the graph window and relaunch the code
 
-#consider a lower amount of variables --> cadmium, copper, lead, zinc
+#Create pairs scatterplots considering only some variables:cadmium, copper, lead, zinc
 pairs(~ cadmium + copper + lead + zinc, data=meuse)
 pairs(meuse[,3:6]) #start from column number 3 to column number 6 
 
-#prettify this graph
-pairs(meuse[,3:6], pch=15,col="blue") #changed the symbol and colour
-pairs(meuse[,3:6], pch=15,col="blue", cex=0.5) #changed also the dimension of the symbol
+#Prettify this graph
+pairs(meuse[,3:6], pch=15,col="blue") #Change the symbol and colour
+pairs(meuse[,3:6], pch=15,col="blue", cex=0.5) #Change the dimension of the symbol; 505 smaller
 
-#add info to the scatter plot --> istall a new package, but at beginning of code
-#use the library --> at beginning of code to download the package
-#GGally will prettify the plot
+#Add info to the scatter plot with GGally (install a new package, but at beginning of code)
+#use the library (at beginning of code) 
 ggpairs(meuse[,3:6])
 
 
