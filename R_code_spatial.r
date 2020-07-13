@@ -16,7 +16,7 @@ coordinates(meuse) = ~ x+y
 #plot = function for plotting objects
 plot(meuse)
 
-#ssplot = plots several layers with a single legend for all maps
+#spplot = plots several layers with a single legend for all maps
 #In this case we are plotting the spatial amount of zinc
 spplot(meuse, "zinc") #declare the set and declare the variable
 
@@ -78,8 +78,8 @@ library(ggplot2) #in order to make use of the package
 
 #setting woring directory
 #Load previously saved R data
-setwd("C:/LAB/)
-load("First.RData") 
+setwd("C:/LAB/")
+load("First.RData")
 #In brackets there is the name of the saved working space
 
 #ls = shows what data sets and functions we defined and used in the recalled workingspace
