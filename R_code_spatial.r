@@ -80,7 +80,7 @@ library(ggplot2) #in order to make use of the package
 #Load previously saved R data
 setwd("C:/LAB/)
 load("First.RData") 
-#First.RData is the name of the saved working space
+#In brackets there is the name of the saved working space
 
 #ls = shows what data sets and functions we defined and used in the recalled workingspace
 ls() 
@@ -89,7 +89,7 @@ library(ggplot2)
 data(mpg)
 head(mpg) 
 
-#key components of ggplot2: data, aesthetics, geometry 
+#Key components of ggplot2: data, aesthetics, geometry 
 #aes = declare the variables
 #geom_point() = declare the geometry of the plot 
 ggplot(mpg, aes(x=displ,y=hwy)) + geom_point() 
@@ -99,8 +99,8 @@ ggplot(mpg, aes(x=displ,y=hwy)) + geom_polygon() #change the geometry to polygon
 #ggplot for our covid dataset
 head(covid)
 ggplot(covid, aes(x=lon, y=lat, size=cases)) + geom_point() 
-#size = x -->  dimension of points changes with respect to a variable x
-#In this case the size of point changes accordingly to the number of cases
+#size = x -->  dimension of points changes with respect to a variable, x
+#In this case the size of points changes accordingly to the number of cases
 
 
 
