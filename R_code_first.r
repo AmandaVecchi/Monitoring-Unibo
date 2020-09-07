@@ -29,4 +29,6 @@ plot(zinc, copper,col="green",pch=19,cex=2) #cex = argument used to specify char
 #cex = 0.5 diminishes the size of the point of 50%
 #cex= 2 enhances the size of the point of 200%
 #cex = 0.7 decreases the seize of the poin of 70%
-#in general to diminish the size of the pont we put 0 < cex < 1
+#cex = 1.5 enhances the size of the point of 50%
+#in general to diminish the size of the pont we put 0 < cex < 1; to enhance the size of the point cex > 1
+
