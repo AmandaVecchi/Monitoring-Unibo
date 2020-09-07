@@ -4,40 +4,38 @@ install.packages("sp")
 install.packages("GGally")
 #GGally is an extension of ggplot2; it adds functions to reduce the complexity of combining geometric objects with transformed data
 
-#library = tells R we want to use the package installed
-library(sp)
-#require(sp) will also do the job
+library(sp) #require(sp) will also do the job
 library(GGally)
 
 data(meuse) 
 attach(meuse)
 
-#names = function to get the name of all variables in the dataset
+#The "names" function allows usto get the name of all variables in the dataset
 names(meuse) 
-head(meuse) #head = function that shows only the first six lines of the dataset
+head(meuse) 
 
 #Plot cadmium vs zinc
 plot(cadmium,zinc)
 plot(cadmium, zinc, pch=15, col="red", cex=2) 
 #pch = argument used to specify point shapes
-#col = declare the color of the point plotted
-#cex = number indicating the amount by which plotting symbols should be scaled relative to the default. 2 = all points enhanced by 100%
+#col = argument used to declare the color of the point plotted
+#cex = number indicating the amount by which plotting symbols should be scaled relative to the default
 
-#pairs = creates matrix of all scatterplots of the dataset
+#The "pairs" function creates a matrix of all scatterplots of the dataset
 pairs(meuse) #creates all the possible pairwise plots of the dataset
 
-#error = "size of the margins is too large". Solution = reshape with mouse the graph window and relaunch the code
+#IF we get error = "size of the margins is too large", the solution is to reshape with our mouse the graph window and relaunch the "pairs" code
 
 #Create pairs scatterplots considering only some variables:cadmium, copper, lead, zinc
-pairs(~ cadmium + copper + lead + zinc, data=meuse)
-pairs(meuse[,3:6]) #start from column number 3 to column number 6 
+#The tilde operator states which are the dependent variables
+pairs(~ cadmium + copper + lead + zinc, data=meuse) #in this case we also state the dataset in which the variables are contained
+pairs(meuse[,3:6]) #using the square brackets tell R to start take all variables starting from column number 3 to column number 6 
 
-#Prettify this graph
-pairs(meuse[,3:6], pch=15,col="blue") #Change the symbol and colour
-pairs(meuse[,3:6], pch=15,col="blue", cex=0.5) #Change the dimension of the symbol; 505 smaller
+#Let's prettify this graph
+pairs(meuse[,3:6], pch=15,col="blue") 
+pairs(meuse[,3:6], pch=15,col="blue", cex=0.5) #cex = 0.5 diminishes point size of 50%
 
-#Add info to the scatter plot with GGally (install a new package, but at beginning of code)
-#use the library (at beginning of code) 
+#Now let's add info to the scatter plot with the GGally package (install a new package, but at beginning of code)
 ggpairs(meuse[,3:6])
 
 
