@@ -1,35 +1,39 @@
 # R code for multivariate analysis
 
-library(vegan) #package already installed
+#Setting the working diretory and istalling + stating we are using the "vegan" package
+#The vegan package provides tools for descriptive community ecology; it contains tools for diversity analysis on vegetation
+setwd("C:/LAB/")
+install.packages("vegan")
+library(vegan) 
 
-#download dataset from IOL and import them in R
-#give a name to dataset + assign name to a function (<-) + read.table to import from outside (name) + header = true bc first line is title + separator is the comma, so we state it
-biomes <-read.table("biomes.csv", header=T, sep=",")
-
-#look at the dataset
-head(biomes) #view(biomes) # biomes
+#Download dataset from IOL and import them in R
+#We are giving a name to the dataset, assigning a name to the read.table function (<-)
+biomes <-read.table("biomes.csv", header=T, sep=",") #sep is an argument that declares which is the separator of the lines in the dataset
+head(biomes) #view(biomes) 
 
 # Multivariate analysis
-# detrended correspondence analysis (=see data in 2D) --> decorana
-multivar <- decorana(biomes)
+#The "decorana" function performs detrended correspondence analysis (=see data in 2D)
+#DCA is a technique used to find the main factors or gradients in large, species-rich but usually sparse data matrices 
+multivar <- decorana(biomes) #We are also giving a name to the correspondence analysis we are performing
 plot(multivar)
 
-#see how much data we are loosing when transforming in a 2D vision
-multivar # eigenvaues= perception of the whole system in all 4 dimensions(expressed in percentage)
+#See how much data we are loosing when transforming the data in a 2D vision
+multivar
 
 plot(multivar)
-biomes_types <-read.table("biomes_types.csv", header=T, sep=",")
+biomes_types <-read.table("biomes_types.csv", header=T, sep=",") #We are making use of a new dataset
 head(biomes_types)
-
-#link the points to see if different biomes can be seen in ou graph
 attach(biomes_types) #attach our dataset
-#draw ellipse connecting all point of one biome
-ordiellipse(multivar, type, col=1:4, kind="ehull", lwd=3) #declare the colums to make group + col= colours to distinguish different biomes + kind of raggruppation +  dimension of line of ellipse
-# col=c("green", "blue", "black", "red")
 
-ordispider(multivar, type, col=1:4, label=TRUE) #species not included in the ellipse are those that cannot be included in the ellipse bc we are looking at our dataset in only 2D out of 4D
+#The "ordiellipse" function draws ellipses connecting all point belonging to one biome
+ordiellipse(multivar, type, col=1:4, kind="ehull", lwd=3) 
+#We declare the dataset and the columns we want to base our ellipses on
+#col= colours to distinguish different biomes
+#kind = "ehull" = draws ellipsoid that enclose all points in the group (ehull)
+#lwd = dimension of line of ellipse
+#Or also col=c("green", "blue", "black", "red")
 
-
+ordispider(multivar, type, col=1:4, label=TRUE) #In this case we are creating a spider diagram 
 
 
 
