@@ -24,7 +24,7 @@ attach(meuse)
 plot(zinc, copper)
 plot(zinc, copper,col="green") #col = argument to state in which colour to plot the points in the graph
 plot(zinc, copper,col="green",pch=19) #pch = argument used to specify point shapes
-plot(zinc, copper,col="green",pch=19,cex=2) #cex = argument used to specify character exaggeration 
+plot(zinc, copper,col="green",pch=19,cex=2) #cex = argument used to indicate the amount by which plotting symbols should be scaled relative to the default
 
 #cex = 0.5 diminishes the size of the point of 50%
 #cex= 2 enhances the size of the point of 200%
