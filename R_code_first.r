@@ -2,6 +2,7 @@
 
 #The "install.packages" function downloads and install packages from CRAN repositories or from local files.
 install.packages("sp") #sp is a package that allows us to manipulate and work on spatial datasets
+
 #The "library" or "require" function specifies to R we want to use the package we have installed
 library(sp)
 
