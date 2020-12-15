@@ -29,7 +29,7 @@ pairs(meuse) #creates all the possible pairwise plots of the dataset
 #Create pairs scatterplots considering only some variables:cadmium, copper, lead, zinc
 #The tilde operator states which are the dependent variables
 pairs(~ cadmium + copper + lead + zinc, data=meuse) #in this case we also state the dataset in which the variables are contained
-pairs(meuse[,3:6]) #using the square brackets tell R to start take all variables starting from column number 3 to column number 6 in the dataset we are using
+pairs(meuse[,3:6]) #using the square brackets tells R to start take all variables starting from column number 3 to column number 6 in the dataset we are using
 
 #Let's prettify this graph
 pairs(meuse[,3:6], pch=15,col="blue") 
