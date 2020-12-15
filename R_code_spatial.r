@@ -69,9 +69,9 @@ data(mpg) #We are using a new dataset
 head(mpg) 
 
 #Key components of ggplot2: data, aesthetics, geometry 
-#aes = declare the variables
-#geom_point() = declare the geometry of the plot 
-ggplot(mpg, aes(x=displ,y=hwy)) + geom_point() 
+#aes = declares the variables
+#geom = declares the geometry of the plot 
+ggplot(mpg, aes(x=displ,y=hwy)) + geom_point() #the geometry used is points
 ggplot(mpg, aes(x=displ,y=hwy)) + geom_line() #change the geometry to lines 
 ggplot(mpg, aes(x=displ,y=hwy)) + geom_polygon() #change the geometry to polygons
 
