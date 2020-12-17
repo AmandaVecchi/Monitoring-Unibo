@@ -1,19 +1,23 @@
-## set working directory
-setwd("C:/LAB/")
+##R code fror remote sensing
 
-#importing one image
+#Setting the working directory, recalling previously installed packages
+setwd("C:/LAB/")
 library(raster)
 library(RStoolbox)
-p224r63_2011 <- brick("p224r63_2011_masked.grd")
 
+#Importing an image and maning it
+p224r63_2011 <- brick("p224r63_2011_masked.grd")
+plot(p224r63_2011)
+
+#Bands of Landsat
 #B1 = blue
 #B2 = green
 #B3 = red
 #B4 = NIR (leaf reflects)
-#B5 = SWIR
-#B6 = thermal infrared
-#B7 = SWIR (it has additional properties)
-#B8 = panchromatic
+  #B5 = SWIR
+  #B6 = thermal infrared
+  #B7 = SWIR (it has additional properties)
+  #B8 = panchromatic
 
 # RGB : 
 plotRGB(p224r63_2011, r= 5, g=4, b=3, stretch="Lin")
