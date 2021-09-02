@@ -410,7 +410,7 @@ hist(difdvi) #create an histogram
 
 ########## 8. R code for PCA remore sensing
 
-setwd("C:/LAB")
+setwd("C:/LAB/")
 library(raster)
 library(RStoolbox)
 library(ggplot2)
@@ -507,13 +507,13 @@ text(toy8bits, digits=2)
 
 #plot all together
 par(mfrow=c(1,4))
-  plot(toy)
+plot(toy)
 text(toy,digits=2)
-  plot(toy2bits)
+plot(toy2bits)
 text(toy2bits, digits=2)
-  plot(toy4bits)
+plot(toy4bits)
 text(toy4bits, digits=2) 
-  plot(toy8bits)
+plot(toy8bits)
 text(toy8bits, digits=2)
 
 ############################################################
@@ -521,6 +521,372 @@ text(toy8bits, digits=2)
 ############################################################
 
 ########## 10. R code for faPAR
+#faPAR = fraction of the solar radiation absorbed by living leaves 
+
+setwd("C:/LAB/")
+library(raster)
+library(rasterVis)
+library(rasterdiv)
+library(sf)
+
+plot(copNDVI) # Copernicus NDVI from the rasterdiv package
+
+#Let's reclassify the data and remove water from the analysis
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA)) # "cbind" removes data, what value to substitute to the removed ones
+# NA = no data
+levelplot(copNDVI)
+
+faPAR10 <- raster("farPAR10.tif") # import the image
+levelplot(farPAR10)
+
+#Save the plot as .PDF
+pfd("copNDVI.pdf")
+levelplot(coNDVI)
+dev.off()
+
+pdf("faPAR.pdf")
+levelplot(faPAR10)
+dev.off()
+
+#######Let's continue
+setwd("C:/LAB/") 
+load("faPAR.RData")
+library(raster)
+library(rasterdiv)
+library (rasterVis)
+
+#the original faPAR from Copernicus is 2GB. Let's see how much space is needed for an 8-bit set
+writeRaster(copNDVI, "copNDVI.tif") # 5.3 MB
+
+levelplot(faPAR10) 
+
+########## Regression model between faPAR and NDVI
+
+erosion <- c(12,14,16,24,26,40, 55,67) #ex. amount of erosion in a certain area
+hm <- c(30,100,150,200,260,340,,460,600) #ex. amount of heavy metals
+
+plot(erosion, hm, col="red", pch=19, xlab="Erosion", ylab="Heavy metals") #xlab and ylab set the lables for x and y axis
+
+#Create a linear model!!!
+model1 <- lm(hm ~ erosion)
+summary(model1)
+abline(model1) #function that creates regression lines on plots
+#We create a regression line that relates erosion and number of heavy metals
+
+## faPAR vs NDVI model
+setwd("C:/LAB/")
+library(raster)
+faPAR10 <- raster("farPAR10.tif")
+plot(faPAR10)
+
+plot(copNDVI)
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA), right=TRUE)
+
+#We want to see how the two variables are related
+# RANDOM SAMPLES
+random.points <- function(x,n)  # x is the raster file, n is the number of the random points
+{
+lin <- rasterToContour(is.na(x))
+pol <- as(st_union(st_polygonize(st_as_sf(lin))), 'Spatial') 
+pts <- spsample(pol[1,], n, type = 'random')
+}
+
+pts <-  random.points(faPAR10, 1000) #ex. we select 1000 points from faPAR10
+plot(faPAR10)
+points(pts,col="red",pch=19)
+ 
+#Let's extract points from a raster
+copNDVIp <-extract (copNDVI, pts)
+faPAR10p <-extract (faPAR10, pts)
+
+#Create a model for PHOTOSYNTHESIS vs BIOMASS
+model2 <- lm(faPAR10p ~ copNDVIp)
+plot(copNDVIp, faPAR10p, col="green", xlab="Biomass", ylab="Photosynthesis")
+abline(model2, col="red")
+
+############################################################
+############################################################
+############################################################
+
+########## 11. R code EVB (measure the standard deviation from a satellite image)
+
+setwd("C:/LAB/")
+
+library(raster)
+library(Rstoolbox) #for PCA
+
+snt <- brick("snt_r10.tif")
+plot(snt)
+
+#REMEMBER:
+#B1 = blue
+#B2 = green
+#B3 = red
+#B4 = NIR
+#RGB -> R = 3, G = 2, B = 1
+
+plotRGB(snt, 3,2,1, stretch="lin") # plot the image with RGB system, visible colours 
+plotRGB(snt, 4,3,2, stretch="lin") # plotting NIR in top of red = vegetation coloured in red
+
+pairs(snt) #Scatterplot matrices
+
+###### PCA analysis
+sntpca <- rasterPCA(snt) # "rasterPCA" calculates R-mode PCA for raster images
+sntpca #see the result
+summary(sntpca$model)
+plot(sntpca$map) 
+
+# Make a RGB plot
+plotRGB(sntpca$map, 1,2,3, stretch="lin") 
+
+#Let's calculate che standard deviation and create a moving window
+window <- matrix(1, nrow=5, ncol=5) #"matrix" function is used to create a matrix defined by the arguments nrow and ncol
+window #here we have the moving window
+
+#"focal" function calculates values for the neighborhood of focal cells component
+sd_snt <- focal(sntpca$map$PC1, w=window, fun=sd) 
+# "w" states the moving window we want to use
+# "fun" states the function to be applied. sd = standard deviation
+cl <- colorRampPalette(c("dark blue", "green", "orange", "red"))(100)
+plot(sd_snt, col=cl)
+
+par(mfrow=c(1,2))
+plotRGB(snt,4,3,2, stretch="lin", main="original image") 
+plot(sd_snt, col=cl, main="diversity")
+
+######Let's continue
+#Focus on Cladonia stellaris species
+
+library(raster)
+library(RStoolbox)
+
+setwd("C:/LAB/")
+
+clad <- brick("cladonia_stellaris_calaita.JPG")  #Importing the image related to C. stellaris
+
+#Create a moving window of a matrix of 3 by 3 pixels (number 1 doesn't impact the calculation) 
+window <- matrix(1, nrow = 3, ncol = 3)
+window
+
+#PCA analysis for C. stellaris
+cladpca <- rasterPCA(clad)
+cladpca #see the output of the applied function
+summary(cladpca$model) #variance is 0.98 = 98% of the first component 
+plotRGB(cladpca$map, 1,2,3, stretch="lin") #plotting the results
+
+#Set the moving window again
+window <- matrix(1, nrow=5, ncol=5)
+window
+
+# "focal" calculates values for neighborhood of focal cells
+sd_clad <- focal(cladpca$map$PC1, w=window, fun=sd) 
+
+#Apply the aggregate function
+PC1_agg <- aggregate(cladpca$map$PC1, fact=10)
+sd_clad_agg <- focal(PC1_agg, w=window, fun=sd) 
+
+#Let's see both graphs together to see the differencies 
+par(mfrow=c(1,2))  
+cl <- colorRampPalette(c('yellow','violet','black'))(100) 
+plot(sd_clad,col=cl) 
+plot(sd_clad_agg,col=cl)  #cladonia set aggregated 
+
+#Let's plot the calculation 
+par(mfrow=c(1,2)) 
+cl <- colorRampPalette(c('yellow','violet','black'))(100) 
+plotRGB(clad, 1,2,3, stretch="lin")
+plot(sd_clad, col=cl)
+
+dev.off()
+
+############################################################
+############################################################
+############################################################
+
+########## 12. R code NO2
+
+setwd("C:/LAB/NO2/")
+install.packages("ncdf4") 
+library(ncdf4) #ncdf4 is a package to read all the netCDF files. All Copernicus data use this extension
+
+#EXERCISE:import all of the NO2 data in R using the lapply function 
+#We want to import a set of files, so we create a list spcifying all files we want to import
+rlist <- list.files(pattern="EN")  # "pattern" = states on which base R has to select the imported data: they all contain in the name "EN" 
+
+import <- lapply(rlist, raster) #importing all the file selected with rlist 
+
+EN <- stack(import) #"stack" function is used to create a multitemporal image 
+cl <-colorRampPalette(c('red','orange','yellow'))(100) 
+plot(EN,col=cl) #plot the images all together 
+
+#Let's see the difference from the first and last day 
+par(mfrow=c(1,2))
+plot(EN$EN_0001, col=cl)
+plot(EN$EN_0013, col=cl)
+
+#Plot with RGB the first, seventh and last image
+plotRGB(EN, r=1, g=7, b=13,stretch="lin") 
+
+#Let's see the difference between the final and initial day
+dif <- EN$EN_0013 - EN$EN_0001
+cld <-colorRampPalette(c('blue','white','red'))(100) #red means high differences, blue means lower difference
+plot(dif,col=cld) 
+
+#Quantitative measure of the decreasing of NO2
+ #Let's create a boxplot to see the relative differencies
+boxplot(EN)
+boxplot(EN,outline=F) #vertical boxplot with the outlines removed 
+boxplot(EN,outline=F, horizontal=T) #horizontal boxplot
+boxplot(EN,outline=F, horizontal=T, axes=T)
+
+plot(EN$EN_0001, EN$EN_0013)
+
+# Comparing each pixels of 2 stituations plotting the 2 images in order to see if NO2 decreases o increases in each pixel
+plot(EN$EN_0001, EN$EN_0013) 
+abline(0,1,col="red") #most of the point are under the line, that means that the NO2 decreases
+
+############################################################
+############################################################
+############################################################
+
+########## 13. R code snow
+
+setwd("C:/LAB/SNOW/")
+library(ncdf4)
+library(raster)
+
+#Let's import the required image
+snowmay <- raster("c_gls_SCE_202005260000_NHEMI_VIIRS_V1.0.1.nc")
+
+cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
+
+#EXERCISE: plot snow cover with the cl palette
+plot(snowmay,col=cl) 
+
+#Now let's import the snow related data
+snow2000r <- raster("snow2000r.tif")
+snow2005r <- raster("snow2005r.tif")
+snow2010r <- raster("snow2010r.tif")
+snow2015r <- raster("snow2015r.tif")
+snow2020r <- raster("snow2020r.tif")
+
+#Let's look at all the data toether represented with the same colour palette
+par(mfrow=c(2,3)) #multiframe row 
+plot(snow2000r, col=cl)
+plot(snow2005r, col=cl)
+plot(snow2010r, col=cl)
+plot(snow2015r, col=cl)
+plot(snow2020r, col=cl)
+
+####FASTER version to mport all the required images
+# rlist <- list.files(pattern="snow")  #they all contain the word "snow"--> same pattern 
+# import<- lapply(rlist, raster) 
+# snow.multitemp <- stack(import) # "stack" function allows us to create a multitemporal image 
+plot(snow.multitemp,col=cl) # we have all the plot together without using the par function 
+
+###Let's make a prediction
+source("prediction.r") #we use a script in R 
+
+# Since the code needs time, we can download predicted.snow.2025.norm.tif from iol in the Data and upload it into R
+predicted.snow.2025.norm <- raster("predicted.snow.2025.norm.tif")
+plot(predicted.snow.2025.norm, col=cl)
+
+######Let's continue
+
+setwd("C:/LAB/SNOW")
+
+#EXERCISE: import the snow cover images all together
+rlist <- list.files(pattern="snow")
+import <- lapply(rlist, raster)
+snow.multitemp <- stack(import)
+cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
+plot(snow.multitemp, col=cl)
+
+#Load the prediction file (we did it the previous time already) 
+prediction <- raster("predicted.2025.norm.tif")
+plot(prediction, col=cl) #snow cover will be present only in the northern part of the world 
+
+#Now export the output we obtained
+writeRaster(prediction, "final.tif") 
+#in the folder "SNOW" we have now have a file named "final.tif
+
+final.stack <- stack(snow.multitemp, prediction)
+plot(final.stack, col=cl) #plot all the images together 
+
+#export the R graph as a pdf
+pdf("my_final_graph.pdf")
+plot(final.stack, col=cl)
+dev.off()
+
+#export the R graph as a png
+png(("my_final_graph.pdf")
+plot(final.stack, col=cl)
+dev.off()
+
+############################################################
+############################################################
+############################################################
+
+########## 14. R code "CROP"
+
+setwd("C:/LAB/") 
+    
+library(raster)
+library(ncdf4)
+ 
+snow <- raster("c_gls_SCE_202005260000_NHEMI_VIIRS_V1.0.1.nc")
+cl <- colorRampPalette(c('darkblue','blue','light blue'))(100)
+plot(snow, col=cl)
+
+#Let's have a look only to Italy
+ext <- c(0, 20, 35, 50)
+
+#Zoom on the desired area
+zoom(snow, ext=ext)
+
+#Crop the image with the focus on the area that we want 
+crop(snow, ext)
+snowitaly <- crop(snow, ext)
+
+#to obtain a rectangular image
+zoom(snow, ext=drawExtent())
+
+############################################################
+############################################################
+############################################################
+
+########## 15. R code interpolation
+
+setwd("C:/LAB/)
+
+library(spatstat)
+inp <- read.table("dati_plot55_LAST3.csv", sep=";", head=T)
+head(inp) #see the titles of the table 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
