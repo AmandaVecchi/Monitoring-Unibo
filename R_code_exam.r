@@ -221,6 +221,242 @@ biomes_types <- read.table("biomes_types.csv", head=T, sep=",")
 head(biomes_types)
 attach(biomes_types) #declaring we are working with this new data.frame
 
+#Drawing an ellipse that connect all the points belonging to the same biome
+ordiellipse(multivar, type, col=1:4, kind = "ehull", lwd=3)
+# kind= type of graph --> hull is a convex shape and "e" is for ellipse
+# 4 different biomes, so 4 different colors or we can write col=c("green","blue","red","black")
+
+ordispider(multivar, type, col=1:4, label=T) #create a spider diagram
+
+############################################################
+############################################################
+############################################################
+
+########## 6. R code for remote sensing (RS)
+
+setwd("C:/LAB/") 
+install.packages("raster") # raster allows us to work with images
+install.packages("RStoolbox") # package for remote sensing image, processing and analysis such as calculating spectral indeces, principal component transformation
+library(raster) 
+
+#Let's import an image
+p224r63_2011 <- brick("p224r63_2011_masked.grd") 
+plot(p224r63_2011)
+
+#Plot the image with different colours -> create e new palette
+cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+plot(p224r63_2011, col=cl)
+
+#EXERCISE: plot the image with a new color ramp palette
+cl <- colorRampPalette(c('red','blue'))(100) 
+plot(p224r63_2011, col=cl)
+
+# Bands of landsat
+# B1: blue band
+# B2: green band
+# B3: red band
+# B4: NIR (infrared) band (just after the red in the electromagnetic spectrum)
+
+#Closing the graph
+dev.off()
+
+#Create an image with different plots
+par(mfrow=c(2,2)) #number of row x column
+	
+# B1: blue band
+clb <- colorRampPalette(c('dark blue','blue','light blue'))(100) 
+plot(p224r63_2011$B1_sre, col=clb)     #$ is used to link every single band to an image
+	
+# B2: green band
+clg <- colorRampPalette(c('dark green','green','light green'))(100) 
+plot(p224r63_2011$B2_sre, col=clg)  
+	
+# B3: red band
+clr <- colorRampPalette(c('dark red','red','pink'))(100) 
+plot(p224r63_2011$B3_sre, col=clr)  
+	
+# B4: NIR band
+cln <- colorRampPalette(c('red','orange','yellow'))(100) 
+plot(p224r63_2011$B4_sre, col=cln)  
+
+#Create an image with all the images above arranged in 1 column
+par(mfrow=c(4,1))
+dev.off()
+
+# in the computer there are 3 components that make the colors visible: RGB system
+# R --> we associate the 3rd red band to R
+# G --> we associate the 2nd green band to G
+# B --> we associate the 1st blu band to B
+
+#plotRGB
+plotRGB(p224r63_2011, r=3, g=2, b=1, stretch="Lin")
+#plotRGB(name of the images, correspondence between the RGB system and the bands of landsat, the color is stretched linearily 
+
+# EXERCISE: NIR on top of the G component of the RGB 
+# invert 4 with 3
+plotRGB(p224r63_2011, r=3, g=4, b=2, stretch="Lin") 
+plotRGB(p224r63_2011, r=3, g=2, b=4, stretch="Lin")
+
+###### Let's continue
+setwd("C:/LAB/")
+load("rs.RData")
+ls()
+library(raster)
+
+#Working with other images, older images
+p224r63_1988_masked <- brick("p224r63_1988_masked.grd")
+plot(p224r63_1988_masked)
+
+# EXERCISE: plot in visible RGB 321 both images (2011 and 1988)
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=3, g=2, b=1, stretch="Lin")
+plotRGB(p224r63_2011_masked, r=3, g=2, b=1, stretch="Lin")
+
+# EXERCISE: plot in visible RGB 432 both images
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="Lin")
+
+#let's enhance the noise of the images
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=4, g=3, b=2, stretch="hist")
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="hist")
+
+#DVI= NIR - RED --> stressed plants have very low value of difference vegetation index
+dvi2011 <- p224r63_2011_masked$B4_sre - p224r63_2011_masked$B3_sre #calculate DVI -> NIR is B4 - B3 in landstat bands
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+plot(dvi2011)
+
+#EXERCISE: plot DVI for 1988
+dvi1988 <- p224r63_1988_masked$B4_sre - p224r63_1988_masked$B3_sre
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+plot(dvi1988)
+
+#Let's see the difference between the two years
+diff <- dvi2011 - dvi1988
+
+#See the effects of changing the scale, resolution
+#resolution = dimension of pixels = resempling
+p224r63_2011res <- aggregate( p224r63_2011_masked, fact=10) # "fact" increase the pixel size * 10
+p224r63_2011res100 <- aggregate( p224r63_2011_masked, fact=100) #increase pixel size * 100
+
+#plot the regular and enhanced images all together in column 
+par(mfrow=c(3,1))
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res100, r=4, g=3, b=2, stretch="Lin")
+
+############################################################
+############################################################
+############################################################
+
+########## 7. R code for ecosystem function
+# R code to see biomass over the world and calculate changes in ecosystem functions (energy, chemical cycling and proxies)
+
+install.packages("rasterdiv") #this package provides functions to calculate indices of diversity on raster data
+install.packages("rasterVis") #package for visualization
+library(rasterdiv) 
+library(rasterVis) 
+
+data(copNDVI) #Copernicus Long-term database
+plot(copNDVI)
+
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA)) # removing water-based colours -> reclassify: function that reclassify groups of values to other values
+levelplot(copNDVI) #plot the image as a level plot               
+
+copNDVI10 <- aggregate (copNDVI, fact=10) # aggregating 10 pixel in 1 
+levelplot(copNDVI10) 
+copNDVI100 <- aggregate (copNDVI, fact=100) #exageratig the aggregation
+levelplot(copNDVI100) 
+
+###### Let's continue
+setwd("C:/LAB/")
+library(raster)
+
+defor1 <- brick("defor1_.jpg")
+defor2 <- brick("defor2_.jpg")
+
+#REMEMBER:
+# Band 1: NI
+# Band 2: red
+# Band 3: green 
+
+#plot the images together
+par(mfrow=c(1,2))
+plotRGB(defor1, r=1, g=2, b=3, stretch="Lin")
+plotRGB(defor2, r=1, g=2, b=3, stretch="Lin")
+
+#Let's calculate DVI for defor1 and defor2
+dvi1 <- defor1$defor1_.1 - defor1$defor1_.2 # we use $ because we haven't attached defor1 to R
+dvi2 <- defor2$defor2_.1 - defor2$defor2_.2
+
+#Plot the two graphs for DVI with a specific colour scheme
+cl <- colorRampPalette(c('darkblue','yellow','red','black'))(100) # specifying the color scheme
+par(mfrow=c(1,2))
+plot(dvi1, col=cl)
+plot(dvi2, col=cl)
+
+dev.off() 
+
+difdvi <- dvi1 - dvi2
+cld <- colorRampPalette(c('blue','white','red'))(100) 
+plot(difdvi, col=cld)
+
+hist(difdvi) #create an histogram 
+
+############################################################
+############################################################
+############################################################
+
+########## 8. R code for PCA remore sensing
+
+setwd("C:/LAB")
+library(raster)
+library(RStoolbox)
+library(ggplot2)
+
+p224r63_2011 <- brick("p224r63_2011_masked.grd") # import the images 
+
+#B1: blue
+#B2: green
+#B3: red
+#B4: NIR
+#B5: SWIR (Short-Waved InfraRed)
+#B6: thermal infrared 
+#B7: SWIR
+#B8: panchromatic
+
+#Plot the image with RGB
+plotRGB(p224r63_2011, r=5, g=4, b=3, stretch="Lin") 
+ggRGB(p224r63_2011,5,4,3) # "ggRGB" calculates RGB color composite raster for plotting with ggplot2
+
+#Now plot the 1988 image
+p224r63_1988 <- brick("p224r63_1988_masked.grd")
+plotRGB(p224r63_1988, r=5, g=4, b=3, stretch="Lin")
+ggRGB(p224r63_1988,5,4,3)
+
+#Plot both images together (2011 and 1988)
+par(mfrow=c(1,2))
+plotRGB(p224r63_1988, r=5, g=4, b=3, stretch="Lin")
+plotRGB(p224r63_2011, r=5, g=4, b=3, stretch="Lin")
+
+names(p224r63_2011) #see the bands
+plot(p224r63_2011$B1_sre,p224r63_2011$B1_sre) # to see if these bands are correlated 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
