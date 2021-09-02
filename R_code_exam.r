@@ -857,30 +857,122 @@ zoom(snow, ext=drawExtent())
 
 ########## 15. R code interpolation
 
-setwd("C:/LAB/)
+setwd("C:/LAB/")
 
 library(spatstat)
 inp <- read.table("dati_plot55_LAST3.csv", sep=";", head=T)
-head(inp) #see the titles of the table 
+head(inp)  
 
+attach(inp) #attach our dataframe (inp)
+#plot(inp$X, inp$Y) if we do not use the "attach" function
+plot(X,Y)
+summary(inp)
 
+#Let's make a planar point pattern
+inppp <- ppp(x=X, y=Y, c(716000,718000),c(4859000,4861000)) #Stating the 2 variables and the range "c()" for them
 
+names(inp) #Let's have a look at the names of the variables
 
+marks(inppp) <- Canopy.cov #Extracting the marks
 
+canopy <- Smooth(inppp) #we are going to interpolate the data 
+plot(canopy) #plot smooth
+points(inppp,col="green")
 
+##Lichens cover
+marks(inppp)<- cop.lich.mean  #lichens on the trees and absence of lichens reflects high pollution 
+lichs<- Smooth(inppp)
+plot(lichs)
+points(inppp) #We see that the higher amount of lichens is in the north, less polluted area
 
+#Plot the images together
+par(mfrow=c(1,2))
+plot(canopy)
+points(inppp)
+plot(lichs)
+points(inppp)
+plot(Canopy.cov, cop.lich.mean, col="red", pch=19, cex=2)
 
+### Psammophilous vegetation
+inp.psam <- read.table("dati_psammofile.csv", sep=";", head=T)
+attach(inp.psam) 
+head(inp.psam)
 
+plot(E,N) 
+inp.psam.ppp <- ppp(x=E,y=N,c(356450,372240),c(5059800,5064150))
 
+marks(inp.psam.ppp)<- C_org # measure carbon in the soil 
+C <- Smooth(inp.psam.ppp) #C = carbon
+plot(C) 
+points(inp.psam.ppp)
 
+############################################################
+############################################################
+############################################################
 
+########## 16. R code SDM = Species Distribution Modelling
+    
+install.packages("sdm") 
+install.packages("rgdal")
+library(sdm)
+library(raster) #used for geological variables: predictors  (shp)
+library(rgdal) #used for species
 
+#Let's import species data
+file<-system.file("external/species.shp", package="sdm") 
+species<-shapefile(file)
+species #too see all the information about the species 
+    
+species$Occurrence #occurrence is 0 (= absent) or 1 ( = present)
+plot(species[species$Occurrence == 1,],col="blue",pch=16)
+points(species[species$Occurrence == 0,],col="red",pch=16)
+    
+#Environmental variables
+path<-system.file("external", package="sdm") 
+lst<-list.files(path=path,pattern="asc$",full.names = T) 
+lst
 
+#Plotting all the variables inside the stack
+preds<-stack(lst)
+cl<-colorRampPalette(c("blue","orange","red","yellow")) (100)
+plot(preds, col=cl)
 
+plot(preds$elevation, col=cl)
+points(species[species$Occurrence == 1,], pch=16)
 
+plot(preds$temperature, col=cl)
+points(species[species$Occurrence == 1,], pch=16)
 
+plot(preds$precipitation, col=cl)
+points(species[species$Occurrence == 1,], pch=16)
 
+plot(preds$vegetation, col=cl)
+points(species[species$Occurrence == 1,], pch=16)
 
+#Let's make the model
+d<-sdmData(train=species, predictors=preds) #training set=insitu data(species set make previously), predictors=where the sp are predicted to be (stack of all of the variables) 
+d #to see what there is inside 
+m1<-sdm(Occurrence~elevation+precipitation+temperature+vegetation, data=d, methods="glm") 
+p1<-predict(m1, newdata=preds)
+plot(p1, col=cl)
+points(species[species$Occurrence == 1,], pch=16)
+s1 <- stack(preds,p1)
+plot(s1, col=cl)
+    
+############################################################    
+############################################################    
+############################################################    
+    
+########## 17. R code exam project
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 
