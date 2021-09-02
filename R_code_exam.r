@@ -443,26 +443,84 @@ plotRGB(p224r63_2011, r=5, g=4, b=3, stretch="Lin")
 names(p224r63_2011) #see the bands
 plot(p224r63_2011$B1_sre,p224r63_2011$B1_sre) # to see if these bands are correlated 
 
+###### PCA -> summarize the information in large data tables by means of a smaller set of “summary indices” that can be more easily visualized and analyzed
+#decrease the resolution 
+p224r63_2011_res <- aggregate(p224r63_2011, fact=10)
+p224r63_2011_pca <- rasterPCA(p224r63_2011_res) #Calculates PCA for RasterBricks or RasterStacks and returns a RasterBrick with multiple layers of PCA scores.
 
+plot(p224r63_2011_pca$map) #in this way we have the default color palette
 
+#Let's create a gray plot
+cl <- colorRampPAlette(c("dark grey","grey","light grey"))(100)
+plot(p224r63_2011_pca$map, color=cl) 
 
+#See the results of the function we have applied
+summary(p224r63_2011_pca$model)
 
+#Let's plot the first 3 components of the 2011 image
+pairs(p224r63_2011)
+plotRGB(p224r63_2011_pca$map, r=1, g=2, b=3, stretch="Lin")
 
+###### Now let's do the same of the 1988 image
+p224r63_1988_res <- aggregate(p224r63_1988, fact=10)
+p224r63_1988_pca <- rasterPCA(p224r63_1988_res) 
+plot(p224r63_1988_pca$map, color=cl) 
+summary(p224r63_1988_pca$model)
+pairs(p224r63_1988)
 
+#Calculate the difference in PCA between the two images
+diffpca <- p224r63_2011_pca$map - p224r63_1988_pca$map
+plot(diffpca)
+cldif <-colorRampPalette(c('blue','black','yellow'))(100) 
+plot(diffpca$PC1, color=cldif)
 
+############################################################
+############################################################
+############################################################
 
+########## 9. R code for radiance
 
+library(raster)
+toy <- raster(ncl=2, nrow=2, xmn=1, xmx=2, ymn=1, ymx=2)
+values(toy) <- c(1.13, 1.44,1.55,3.4)
+plot(toy)
+text(toy,digits=2)
 
+# 2 bits --> 2^2 = 4 values 
+toy2bit<- stretch(toy,minv=0, maxv=3) #stretch changes the range of values -> minimum of 0 to a maximum of 3
 
+storage.mode(toy2bits[]) = "integer"  #to ensure that we are going to use integer value 
+plot(toy2bits)
+text(toy2bits, digits=2)    
 
+# 4 bits --> 2^4 =16 values 
+toy4bit<- stretch(toy,minv=0, maxv=15)
+storage.mode(toy4bits[]) = "integer"
+plot(toy4bits)
+text(toy4bits, digits=2) 
 
+# 8 bits --> 2^8 =256 values 
+toy8bit<- stretch(toy,minv=0, maxv=255)
+storage.mode(toy8bits[]) = "integer"
+plot(toy8bits)
+text(toy8bits, digits=2)
 
+#plot all together
+par(mfrow=c(1,4))
+  plot(toy)
+text(toy,digits=2)
+  plot(toy2bits)
+text(toy2bits, digits=2)
+  plot(toy4bits)
+text(toy4bits, digits=2) 
+  plot(toy8bits)
+text(toy8bits, digits=2)
 
+############################################################
+############################################################
+############################################################
 
-
-
-
-
+########## 10. R code for faPAR
 
 
 
