@@ -1075,5 +1075,5 @@ plot(NBR_2021, main = “NBR values for 2021)
 
 #dNBR shows difference between NBR of the two years
 dNBR <- (NBR_2018 – NBR_2021)
-Plot(dNBR, main = “Difference in NBR 2018 – 2021”) 
+plot(dNBR, main = “Difference in NBR 2018 – 2021”) 
 
