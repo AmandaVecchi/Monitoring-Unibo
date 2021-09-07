@@ -17,7 +17,7 @@ library(rgeos)
 library(devtools)
     
 #Upload image from 2014
-setwd("C:/project/2014/")
+setwd("C:/EXAM/2014DATA/")
 rlist2014 <- list.files( pattern = "2014")
 rlist2014
 
