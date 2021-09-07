@@ -1040,7 +1040,7 @@ plot(NDVI2018, main = "NDVI 2018")
 plot(NDVI2021, main = "NDVI 2021") 
 mtext(“NDVI comparison: 2018 vs 2021”, outer=TRUE, cex =1.5)
 
-#difference between the two years
+#Difference between the two years
 diffNDVI <- (NDVI2018 – NDVI2021)
 plot(diffNDVI)
 plot(diffNDVI, main = “NDVI difference between 2018 and 2021”)
