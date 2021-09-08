@@ -1048,7 +1048,7 @@ false2019 <- ggRGB(image2019_crop, r=5, g=4, b=3,stretch = "Lin")
 par(mfrow = c(1,2) , oma=c(0,0,2,0))
 plot(false2016, main = "Fase colour - 2016")
 plot(false2019, main = "False colour - 2019")
-mtext("False colour: Empedrado 2016 vs Empedrado 2019", outer = TRUE, cex = 1.5)
+mtext("False colour - Empedrado 2016 vs Empedrado 2019", outer=TRUE, cex = 1.5)
     
 #CALCULATE NDVI
 #NDVI = (NIR – RED) / (NIR+RED)
@@ -1078,9 +1078,10 @@ plot(diffNDVI, col = cld, main = "NDVI difference between 2016 and 2019")
 NDVI2016_mod <- reclassify(NDVI2016, cbind(-Inf, 0.4, NA))
 NDVI2019_mod <- reclassify(NDVI2019, cbind(-Inf, 0.4, NA))
      
-par(mfrow=c(1,2))
-plot(NDVI2016_mod, main="Vegetation 2016", axes=FALSE)
-plot(NDVI2019_mod, main="Vegetation 2019", axes=FALSE)
+par(mfrow = c(1,2), oma=c(0,0,2,0))
+plot(NDVI2016_mod, main="Vegetation 2016")
+plot(NDVI2019_mod, main="Vegetation 2019")
+mtext("Vegetation comparison: 2016 vs 2019", outer=TRUE, cex =1.5)
 
 #VISUALIZATION USING HISTOGRAMS
 hist_NDVI2016 <- hist(NDVI2016, main = "Distribution of NDVI values - 2016", xlab = "NDVI", ylab = "Frequency", breaks = 50)
@@ -1102,8 +1103,8 @@ col2rgb("pink")
     # R 255
     # G 192
     # B 203
+    
 col2rgb(c("lightblue", "lightgreen", "pink"))
-
 mycol <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50") #make the color transparent by 50%
 c1 <- rgb(173,216,230, max = 255, alpha = 80, names = "lt.blue")
 c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "pink") 
