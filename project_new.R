@@ -121,11 +121,15 @@ mtext("Comparison of distribution of NDVI values: 2016 vs 2019", outer=TRUE, cex
      
 col2rgb("lightblue")
 col2rgb(c("lightblue", "lightgreen", "pink"))
-mycol <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50")
+mycol <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50") #make the color transparent by 50%
+col2rgb("lightblue") #to see the red, green and blue values you need 
+    ## red    173
+    ## green  216
+    ## blue   230
 c1 <- rgb(173,216,230,max = 255, alpha = 80, names = "lt.blue")
 c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "lt.pink") 
 
-par(mai=rep(0.5, 0.5, 0.5, 0.5)) #set the margins for the image
+par(mai=rep(0.5, 4)) #set the margins for the image
 layout(matrix(c(1,1,2,2,0,3,3,0), ncol = 4, byrow = TRUE)) #devide the plotting space
 plot(hist_NDVI2016, col=c2, main="NDVI 2016", xlab = "NDVI")
 plot(hist_NDVI2019, col=c1, main="NDVI 2019", xlab = "NDVI")
