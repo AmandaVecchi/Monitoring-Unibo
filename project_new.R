@@ -90,14 +90,6 @@ par(mfrow = c(1,2), oma=c(0,0,2,0))
 plot(NDVI2016, main = "NDVI 2016") 
 plot(NDVI2019, main = "NDVI 2019") 
 mtext("NDVI comparison: 2016 vs 2019", outer=TRUE, cex =1.5)
-     
-# remove cells where NDVI < 0,4
-NDVI2016_mod <- reclassify(NDVI2016, cbind(-Inf, 0.4, NA))
-NDVI2019_mod <- reclassify(NDVI2019, cbind(-Inf, 0.4, NA))
-     
-par(mfrow=c(1,2))
-plot(NDVI2016_mod, main="Vegetation 2016",  axes=FALSE)
-plot(NDVI2019_mod, main="Vegetation 2019", axes=FALSE)
 
 #Difference between the two years
 diffNDVI <- (NDVI2016 - NDVI2019)
@@ -106,6 +98,14 @@ plot(diffNDVI, main = "NDVI difference between 2016 and 2019")
 
 cld <- colorRampPalette(c('blue','white','red'))(100)
 plot(diffNDVI, col = cld, main = "NDVI difference between 2016 and 2019")
+
+# remove cells where NDVI < 0,4
+NDVI2016_mod <- reclassify(NDVI2016, cbind(-Inf, 0.4, NA))
+NDVI2019_mod <- reclassify(NDVI2019, cbind(-Inf, 0.4, NA))
+     
+par(mfrow=c(1,2))
+plot(NDVI2016_mod, main="Vegetation 2016", axes=FALSE)
+plot(NDVI2019_mod, main="Vegetation 2019", axes=FALSE)
 
 #VISUALIZATION USING HISTOGRAMS
 hist_NDVI2016 <- hist(NDVI2016, main = "Distribution of NDVI values - 2016", xlab = "NDVI", ylab = "Frequency", breaks = 50)
@@ -120,14 +120,18 @@ plot(hist_NDVI2019, main = "NDVI 2019", col = "light blue",border = "black")
 mtext("Comparison of distribution of NDVI values: 2016 vs 2019", outer=TRUE, cex =1.5)
      
 col2rgb("lightblue")
+    # R 173
+    # G 216
+    # B 230
+col2rgb("pink")
+    # R 255
+    # G 192
+    # B 203
 col2rgb(c("lightblue", "lightgreen", "pink"))
+
 mycol <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50") #make the color transparent by 50%
-col2rgb("lightblue") #to see the red, green and blue values you need 
-    ## red    173
-    ## green  216
-    ## blue   230
-c1 <- rgb(173,216,230,max = 255, alpha = 80, names = "lt.blue")
-c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "lt.pink") 
+c1 <- rgb(173,216,230, max = 255, alpha = 80, names = "lt.blue")
+c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "pink") 
 
 par(mai=rep(0.5, 4)) #set the margins for the image
 layout(matrix(c(1,1,2,2,0,3,3,0), ncol = 4, byrow = TRUE)) #devide the plotting space
@@ -136,22 +140,3 @@ plot(hist_NDVI2019, col=c1, main="NDVI 2019", xlab = "NDVI")
 plot(hist_NDVI2016, col = c2, xlim = c(-0.5, 1), main="Comparison between NDVI",xlab = "NDVI" )
 plot(hist_NDVI2019, add = TRUE, col = c1)
      
-#calculate NBR = Normalized Burned Ratio. an index designed to highlight burnt areas 
-#NBR = (NIR-SWIR) / (NIR+SWIR)
-#A high NBR value indicates healthy vegetation while a low value indicates bare ground and recently burnt areas. Non-burnt areas are normally attributed to values close to zero
-
-#2018 NBR
-setwd(“C:/EXAM/2018DATA/”)
-getwd()
-NBR_2018 <- (image2018[[5]] - image2018[[6]]) / (image2018[[5]] + image2018[[6]])
-plot(NBR_2018, main = “NBR values for 2018”)
-
-#2021 NBR
-setwd(“C:/EXAM/2021DATA/”)
-getwd()
-NBR_2021 <- (image2021[[5]] - image2021[[6]]) / (image2021[[5]] + image2021[[6]])
-plot(NBR_2021, main = “NBR values for 2021)
-
-#dNBR shows difference between NBR of the two years
-dNBR <- (NBR_2018 – NBR_2021)
-plot(dNBR, main = “Difference in NBR 2018 – 2021”)
